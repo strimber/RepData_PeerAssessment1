@@ -11,6 +11,8 @@ output:
 Here, we are loading the original source data and displaying a summary view of the raw data.
 ```{r echo=TRUE}
 library(dplyr)
+library(lubridate)
+library(ggplot2)
 activity <- read.csv("~/Coursera Files/ReproducibleResearch/activity.csv")
 activity <- transform(activity, date = factor(date))
 summary(activity)
@@ -79,8 +81,14 @@ There were `r missingData` records with "NA".  The mean value is **`r format(ste
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r echo=TRUE}
+activityNoNA$weekend = chron::is.weekend(as.Date(activityNoNA$date))
+plot_data <- activityNoNA %>% group_by(weekend, interval)  %>% summarize(steps = mean(steps, na.rm=TRUE))
+plotTitle = "Mean Steps per Interval (Weekend vs Weekday)"
+plotYLab = "Mean Steps"
+plotXLab = "Interval"
 
-
+plot <- ggplot(plot_data, aes(x=interval,y=steps,group=weekend)) + geom_line() + facet_grid(weekend ~ .) + labs(x=plotXLab, y=plotYLab, title=plotTitle)
+print(plot)
 
 
 ```
