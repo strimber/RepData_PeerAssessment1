@@ -39,24 +39,22 @@ The mean value is **`r format(stepMean,3)`** and the median value is **`r format
 
 activity <- transform(activity,interval = factor(interval))
 activity <- group_by(activity,interval)
-meanStepsPerInterval <- summarize(activity,steps=mean(steps,na.rm = TRUE))
-
-
-
-stepsSummary <- summarize(activity)
-maximumSteps <- max(stepsSummary$steps)
-maximumInterval <- stepsSummary[stepsSummary$steps==max(maximumSteps),1]
-plot(levels(as.factor(meanStepsPerInterval$interval)), meanStepsPerInterval$steps, 
-     type="l", col="blue", lwd=3, 
-     main="Daily activity pattern", 
-     xlab="Interval (hhmm)", ylab="Average number of steps")
+meanStepsPerInterval <- summarise(activity, steps = mean(steps,na.rm=TRUE))
+maximumMeanStepsPerInterval <- max(meanStepsPerInterval$steps)
+maximumInterval <- meanStepsPerInterval[which.max(meanStepsPerInterval$steps),1]
+ plot(levels(as.factor(meanStepsPerInterval$interval)), meanStepsPerInterval$steps, 
+      type="l", col="red", 
+      main="Daily activity pattern", 
+      xlab="Interval", ylab="Mean number of steps")
 ```
 
-Imputing missing values.... replace NA with the mean Steps Per Interval value and see how this changes the plots
+The maximum mean steps value is `r format(maximumMeanStepsPerInterval,1)` and the interval for that is `r format(maximumInterval,0)`. 
+Imputing missing values.Here, we are replacing NAs with the mean Steps Per Interval value (as stored in the meanStepsPerInterval table).
 
 ## Imputing missing values
 ```{r echo=TRUE}
-activityNoNA <- read.csv("~/Coursera Files/ReproducibleResearch/activity.csv")
+ #reset the dataset 
+activityNoNA <- activity
 missingData <- sum(is.na(activityNoNA))
 i<-1
 for (i in 1:dim(activityNoNA)[1]){
@@ -66,19 +64,24 @@ for (i in 1:dim(activityNoNA)[1]){
                 }
         i=i+1
 }
+activityNoNA <- transform(activityNoNA,interval = factor(interval))
+activityNoNA <- group_by(activityNoNA,interval)
 stepsPerDay2 <- tapply(activityNoNA$steps, activityNoNA$date, sum, na.rm = TRUE)
 stepMean2 <- mean(stepsPerDay2, na.rm=TRUE)
 stepMedian2 <- median(stepsPerDay2, na.rm=TRUE)
 hist(stepsPerDay2,xlab="Interval", ylab = "Mean Steps per Interval (NAs replaced by mean for interval)")
-abline(v=stepMean2, col = "yellow")
+abline(v=stepMean2, col = "red")
 abline(v=stepMedian2, col = "blue")
 
 ```
 
-The mean value is **`r format(stepMean2,3)`** and the median value is **`r format(stepMedian2,3)`**. 
+There were `r missingData` records with "NA".  The mean value is **`r format(stepMean2,3)`** and the median value is **`r format(stepMedian2,3)`**. You can see from the chart that the replacing the NA interval values with thier mean skewed the earlier intervals to higher values.  
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r echo=TRUE}
+
+
+
 
 ```
 
