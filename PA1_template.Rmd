@@ -1,4 +1,5 @@
----
+
+
 title: "Reproducible Research: Peer Assessment 1"
 output: 
   html_document:
@@ -7,19 +8,77 @@ output:
 
 
 ## Loading and preprocessing the data
+Here, we are loading the original source data and displaying a summary view of the raw data.
+```{r echo=TRUE}
+library(dplyr)
+activity <- read.csv("~/Coursera Files/ReproducibleResearch/activity.csv")
+activity <- transform(activity, date = factor(date))
+summary(activity)
+```
 
 
 
 ## What is mean total number of steps taken per day?
+Here, we see a histogram of the Total Steps Per Day activity plotted.  
 
 
+```{r echo=TRUE}
+totalStepsPerDay <- tapply(activity$steps, activity$date, sum)
+stepMean <- mean(totalStepsPerDay, na.rm=TRUE)
+stepMedian <- median(totalStepsPerDay, na.rm=TRUE)
+hist(totalStepsPerDay,xlab="Interval", ylab = "Total Steps Per Day")
+abline(v=stepMean, col = "yellow")
+abline(v=stepMedian, col = "blue")
+
+```
+
+The mean value is **`r format(stepMean,3)`** and the median value is **`r format(stepMedian,3)`**. 
 
 ## What is the average daily activity pattern?
+```{r echo=TRUE}
+
+activity <- transform(activity,interval = factor(interval))
+activity <- group_by(activity,interval)
+meanStepsPerInterval <- summarize(activity,steps=mean(steps,na.rm = TRUE))
 
 
+
+stepsSummary <- summarize(activity)
+maximumSteps <- max(stepsSummary$steps)
+maximumInterval <- stepsSummary[stepsSummary$steps==max(maximumSteps),1]
+plot(levels(as.factor(meanStepsPerInterval$interval)), meanStepsPerInterval$steps, 
+     type="l", col="blue", lwd=3, 
+     main="Daily activity pattern", 
+     xlab="Interval (hhmm)", ylab="Average number of steps")
+```
+
+Imputing missing values.... replace NA with the mean Steps Per Interval value and see how this changes the plots
 
 ## Imputing missing values
+```{r echo=TRUE}
+activityNoNA <- read.csv("~/Coursera Files/ReproducibleResearch/activity.csv")
+missingData <- sum(is.na(activityNoNA))
+i<-1
+for (i in 1:dim(activityNoNA)[1]){
+        if (is.na(activityNoNA[i,1])){
+                r<-match(activityNoNA[i,3],meanStepsPerInterval$interval)
+                activityNoNA[i,1]<-meanStepsPerInterval[r,2]
+                }
+        i=i+1
+}
+stepsPerDay2 <- tapply(activityNoNA$steps, activityNoNA$date, sum, na.rm = TRUE)
+stepMean2 <- mean(stepsPerDay2, na.rm=TRUE)
+stepMedian2 <- median(stepsPerDay2, na.rm=TRUE)
+hist(stepsPerDay2,xlab="Interval", ylab = "Mean Steps per Interval (NAs replaced by mean for interval)")
+abline(v=stepMean2, col = "yellow")
+abline(v=stepMedian2, col = "blue")
 
+```
 
+The mean value is **`r format(stepMean2,3)`** and the median value is **`r format(stepMedian2,3)`**. 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r echo=TRUE}
+
+```
+
