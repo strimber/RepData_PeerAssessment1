@@ -13,26 +13,24 @@ Here, we are loading the original source data and displaying a summary view of t
 library(dplyr)
 library(lubridate)
 library(ggplot2)
+library(qdap)
 activity <- read.csv("~/Coursera Files/ReproducibleResearch/activity.csv")
 activity <- transform(activity, date = factor(date))
 summary(activity)
 ```
 
-
-
 ## What is mean total number of steps taken per day?
 Here, we see a histogram of the Total Steps Per Day activity plotted.  
 
-
 ```{r echo=TRUE}
+
 totalStepsPerDay <- tapply(activity$steps, activity$date, sum)
 stepMean <- mean(totalStepsPerDay, na.rm=TRUE)
 stepMedian <- median(totalStepsPerDay, na.rm=TRUE)
-hist(totalStepsPerDay,xlab="Interval", ylab = "Total Steps Per Day")
-abline(v=stepMean, col = "yellow")
-abline(v=stepMedian, col = "blue")
+hist(totalStepsPerDay,main="Total Steps Per Day", xlab="Total Steps", ylab = "Frequency")
 
 ```
+
 
 The mean value is **`r format(stepMean,3)`** and the median value is **`r format(stepMedian,3)`**. 
 
@@ -47,7 +45,7 @@ maximumInterval <- meanStepsPerInterval[which.max(meanStepsPerInterval$steps),1]
  plot(levels(as.factor(meanStepsPerInterval$interval)), meanStepsPerInterval$steps, 
       type="l", col="red", 
       main="Daily activity pattern", 
-      xlab="Interval", ylab="Mean number of steps")
+      xlab="Daily Interval", ylab="Number of Steps (mean)")
 ```
 
 The maximum mean steps value is `r format(maximumMeanStepsPerInterval,1)` and the interval for that is `r format(maximumInterval,0)`. 
@@ -80,16 +78,21 @@ abline(v=stepMedian2, col = "blue")
 There were `r missingData` records with "NA".  The mean value is **`r format(stepMean2,3)`** and the median value is **`r format(stepMedian2,3)`**. You can see from the chart that the replacing the NA interval values with thier mean skewed the earlier intervals to higher values.  
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+It would appear from the charts below that the activity level tends to be higher on the weekends vs weekdays.  
+
 ```{r echo=TRUE}
 activityNoNA$weekend = chron::is.weekend(as.Date(activityNoNA$date))
+activityNoNA$weekend[activityNoNA$weekend == TRUE] <- "Weekend"
+activityNoNA$weekend[activityNoNA$weekend == FALSE] <- "Weekday"
+
 plot_data <- activityNoNA %>% group_by(weekend, interval)  %>% summarize(steps = mean(steps, na.rm=TRUE))
 plotTitle = "Mean Steps per Interval (Weekend vs Weekday)"
 plotYLab = "Mean Steps"
 plotXLab = "Interval"
 
-plot <- ggplot(plot_data, aes(x=interval,y=steps,group=weekend)) + geom_line() + facet_grid(weekend ~ .) + labs(x=plotXLab, y=plotYLab, title=plotTitle)
+plot <- ggplot(plot_data, aes(x=interval,y=steps,group=weekend)) + geom_line(aes(color=weekend)) + facet_grid(weekend ~ .) + labs(x=plotXLab, y=plotYLab, title=plotTitle) + scale_x_discrete(breaks=seq(0,3000,500))
 print(plot)
-
 
 ```
 
