@@ -48,45 +48,53 @@ maximumInterval <- meanStepsPerInterval[which.max(meanStepsPerInterval$steps),1]
       xlab="Daily Interval", ylab="Number of Steps (mean)")
 ```
 
-The maximum mean steps value is `r format(maximumMeanStepsPerInterval,1)` and the interval for that is `r format(maximumInterval,0)`. 
-Imputing missing values.Here, we are replacing NAs with the mean Steps Per Interval value (as stored in the meanStepsPerInterval table).
+The maximum mean steps value is **`r format(maximumMeanStepsPerInterval,1)`** and the interval for that is **`r format(maximumInterval,0)`**. 
+Imputing missing values. For this situation, we are going to lookup the mean() value for the interval (across all days) and replace the NA with it's mean.  Here, we are replacing NAs with the mean Steps Per Interval value (as stored in the meanStepsPerInterval table).
 
 ## Imputing missing values
 ```{r echo=TRUE}
  #reset the dataset 
-activityNoNA <- activity
-missingData <- sum(is.na(activityNoNA))
-i<-1
-for (i in 1:dim(activityNoNA)[1]){
-        if (is.na(activityNoNA[i,1])){
-                r<-match(activityNoNA[i,3],meanStepsPerInterval$interval)
-                activityNoNA[i,1]<-meanStepsPerInterval[r,2]
-                }
-        i=i+1
+activityCleaned <- activity
+missingData <- sum(is.na(activityCleaned))
+# loop through missing data and replace NA with the mean value for that interval.
+# for each NA value, look up the matching "mean" for that interval and replace.
+# although this uses a loop, with a bit more research I could come up with a cleaner (i.e. package based) 
+# solution to perform the NA replace.
+
+index<-1
+for (index in 1:dim(activityCleaned)[1]) # for each row in activityCleaned
+  {
+    if (is.na(activityCleaned[index,1])) # check if steps value is NA
+      {
+      # find matching interval in meanStepsPerInterval
+        row<-match(activityCleaned[index,3],meanStepsPerInterval$interval)
+        activityCleaned[index,1]<-meanStepsPerInterval[row,2]
+    }
+    index=index+1
 }
-activityNoNA <- transform(activityNoNA,interval = factor(interval))
-activityNoNA <- group_by(activityNoNA,interval)
-stepsPerDay2 <- tapply(activityNoNA$steps, activityNoNA$date, sum, na.rm = TRUE)
+activityCleaned <- transform(activityCleaned,interval = factor(interval))
+activityCleaned <- group_by(activityCleaned,interval)
+stepsPerDay2 <- tapply(activityCleaned$steps, activityCleaned$date, sum, na.rm = TRUE)
 stepMean2 <- mean(stepsPerDay2, na.rm=TRUE)
 stepMedian2 <- median(stepsPerDay2, na.rm=TRUE)
-hist(stepsPerDay2,xlab="Interval", ylab = "Mean Steps per Interval (NAs replaced by mean for interval)")
+hist(stepsPerDay2,xlab="Total Steps", ylab = "Total Steps per Interval",main="Total Steps per day (NA replaced by MEAN)")
 abline(v=stepMean2, col = "red")
 abline(v=stepMedian2, col = "blue")
 
 ```
 
-There were `r missingData` records with "NA".  The mean value is **`r format(stepMean2,3)`** and the median value is **`r format(stepMedian2,3)`**. You can see from the chart that the replacing the NA interval values with thier mean skewed the earlier intervals to higher values.  
+There were `r missingData` records with "NA".  The mean value (red line on graph) is **`r format(stepMean2,3)`** and the median value (blue line on graph) is **`r format(stepMedian2,3)`**. You can see from the chart that the replacing the NA interval values with thier mean skewed the earlier intervals to higher values.  
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 It would appear from the charts below that the activity level tends to be higher on the weekends vs weekdays.  
 
 ```{r echo=TRUE}
-activityNoNA$weekend = chron::is.weekend(as.Date(activityNoNA$date))
-activityNoNA$weekend[activityNoNA$weekend == TRUE] <- "Weekend"
-activityNoNA$weekend[activityNoNA$weekend == FALSE] <- "Weekday"
+activityCleaned$weekend = chron::is.weekend(as.Date(activityCleaned$date))
+activityCleaned$weekend[activityCleaned$weekend == TRUE] <- "Weekend"
+activityCleaned$weekend[activityCleaned$weekend == FALSE] <- "Weekday"
 
-plot_data <- activityNoNA %>% group_by(weekend, interval)  %>% summarize(steps = mean(steps, na.rm=TRUE))
+plot_data <- activityCleaned %>% group_by(weekend, interval)  %>% summarize(steps = mean(steps, na.rm=TRUE))
 plotTitle = "Mean Steps per Interval (Weekend vs Weekday)"
 plotYLab = "Mean Steps"
 plotXLab = "Interval"
