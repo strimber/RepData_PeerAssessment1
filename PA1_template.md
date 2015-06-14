@@ -1,46 +1,103 @@
+# Reproducible Research: Peer Assessment 1
+Scott Trimber  
 
----
-title: "Reproducible Research: Peer Assessment 1"
-author: Scott Trimber
-output: 
-  html_document:
-    keep_md: true
----
-```{r setoptions, echo=TRUE}
+
+```r
 require(knitr)
+```
+
+```
+## Loading required package: knitr
+```
+
+```r
 opts_chunk$set(echo = TRUE, cache = TRUE, cache.path = "cache/", fig.path = "figure/")
 ```
 
 ## Loading and preprocessing the data
 Here, we are loading the original source data and displaying a summary view of the raw data.
-```{r echo=TRUE}
+
+```r
 library(dplyr)
 library(lubridate)
 library(ggplot2)
 library(qdap)
+```
+
+```
+## Loading required package: qdapDictionaries
+## Loading required package: qdapRegex
+## 
+## Attaching package: 'qdapRegex'
+## 
+## The following object is masked from 'package:ggplot2':
+## 
+##     %+%
+## 
+## The following objects are masked from 'package:dplyr':
+## 
+##     escape, explain
+## 
+## Loading required package: qdapTools
+## 
+## Attaching package: 'qdapTools'
+## 
+## The following object is masked from 'package:dplyr':
+## 
+##     id
+## 
+## Loading required package: RColorBrewer
+## WARNING: Rtools 3.1 found on the path at c:/Rtools is not compatible with R 3.2.0.
+## 
+## Please download and install Rtools 3.3 from http://cran.r-project.org/bin/windows/Rtools/, remove the incompatible version from your PATH, then run find_rtools().
+## 
+## Attaching package: 'qdap'
+## 
+## The following object is masked from 'package:dplyr':
+## 
+##     %>%
+## 
+## The following object is masked from 'package:base':
+## 
+##     Filter
+```
+
+```r
 activity <- read.csv("~/Coursera Files/ReproducibleResearch/activity.csv")
 activity <- transform(activity, date = factor(date))
 summary(activity)
 ```
 
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
+```
+
 ## What is mean total number of steps taken per day?
 Here, we see a histogram of the Total Steps Per Day activity plotted.  
 
-```{r echo=TRUE}
 
+```r
 totalStepsPerDay <- tapply(activity$steps, activity$date, sum)
 stepMean <- mean(totalStepsPerDay, na.rm=TRUE)
 stepMedian <- median(totalStepsPerDay, na.rm=TRUE)
 hist(totalStepsPerDay,main="Total Steps Per Day", xlab="Total Steps", ylab = "Frequency")
-
 ```
 
+![](figure/unnamed-chunk-2-1.png) 
 
-The mean value is **`r format(stepMean,3)`** and the median value is **`r format(stepMedian,3)`**. 
+
+The mean value is **10766.19** and the median value is **10765**. 
 
 ## What is the average daily activity pattern?
-```{r echo=TRUE}
 
+```r
 activity <- transform(activity,interval = factor(interval))
 activity <- group_by(activity,interval)
 meanStepsPerInterval <- summarise(activity, steps = mean(steps,na.rm=TRUE))
@@ -52,11 +109,14 @@ maximumInterval <- meanStepsPerInterval[which.max(meanStepsPerInterval$steps),1]
       xlab="Daily Interval", ylab="Number of Steps (mean)")
 ```
 
-The maximum mean steps value is **`r format(maximumMeanStepsPerInterval,1)`** and the interval for that is **`r format(maximumInterval,0)`**. 
+![](figure/unnamed-chunk-3-1.png) 
+
+The maximum mean steps value is **206.1698** and the interval for that is **835**. 
 Imputing missing values. For this situation, we are going to lookup the mean() value for the interval (across all days) and replace the NA with it's mean.  Here, we are replacing NAs with the mean Steps Per Interval value (as stored in the meanStepsPerInterval table).
 
 ## Imputing missing values
-```{r echo=TRUE}
+
+```r
  #reset the dataset 
 activityCleaned <- activity
 missingData <- sum(is.na(activityCleaned))
@@ -84,16 +144,18 @@ stepMedian2 <- median(stepsPerDay2, na.rm=TRUE)
 hist(stepsPerDay2,xlab="Total Steps", ylab = "Total Steps per Interval",main="Total Steps per day (NA replaced by MEAN)")
 abline(v=stepMean2, col = "red")
 abline(v=stepMedian2, col = "blue")
-
 ```
 
-There were `r missingData` records with "NA".  The mean value (red line on graph) is **`r format(stepMean2,3)`** and the median value (blue line on graph) is **`r format(stepMedian2,3)`**. You can see from the chart that the replacing the NA interval values with thier mean skewed the earlier intervals to higher values.  
+![](figure/unnamed-chunk-4-1.png) 
+
+There were 2304 records with "NA".  The mean value (red line on graph) is **9356.261** and the median value (blue line on graph) is **10395**. You can see from the chart that the replacing the NA interval values with thier mean skewed the earlier intervals to higher values.  
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 It would appear from the charts below that the activity level tends to be higher on the weekends vs weekdays.  
 
-```{r echo=TRUE}
+
+```r
 activityCleaned$weekend = chron::is.weekend(as.Date(activityCleaned$date))
 activityCleaned$weekend[activityCleaned$weekend == TRUE] <- "Weekend"
 activityCleaned$weekend[activityCleaned$weekend == FALSE] <- "Weekday"
@@ -105,6 +167,7 @@ plotXLab = "Interval"
 
 plot <- ggplot(plot_data, aes(x=interval,y=steps,group=weekend)) + geom_line(aes(color=weekend)) + facet_grid(weekend ~ .) + labs(x=plotXLab, y=plotYLab, title=plotTitle) + scale_x_discrete(breaks=seq(0,3000,500))
 print(plot)
-
 ```
+
+![](figure/unnamed-chunk-5-1.png) 
 

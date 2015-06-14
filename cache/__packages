@@ -2,3 +2,9 @@ base
 knitr
 dplyr
 ggplot2
+lubridate
+qdapDictionaries
+qdapRegex
+qdapTools
+RColorBrewer
+qdap
