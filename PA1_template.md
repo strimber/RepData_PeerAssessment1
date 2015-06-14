@@ -1,16 +1,14 @@
-# Reproducible Research: Peer Assessment 1
-Scott Trimber  
 
+---
+title: "Reproducible Research: Peer Assessment 1"
+author: Scott Trimber
+output: 
+  html_document:
+    keep_md: true
+---
 
 ```r
 require(knitr)
-```
-
-```
-## Loading required package: knitr
-```
-
-```r
 opts_chunk$set(echo = TRUE, cache = TRUE, cache.path = "cache/", fig.path = "figure/")
 ```
 
@@ -22,47 +20,6 @@ library(dplyr)
 library(lubridate)
 library(ggplot2)
 library(qdap)
-```
-
-```
-## Loading required package: qdapDictionaries
-## Loading required package: qdapRegex
-## 
-## Attaching package: 'qdapRegex'
-## 
-## The following object is masked from 'package:ggplot2':
-## 
-##     %+%
-## 
-## The following objects are masked from 'package:dplyr':
-## 
-##     escape, explain
-## 
-## Loading required package: qdapTools
-## 
-## Attaching package: 'qdapTools'
-## 
-## The following object is masked from 'package:dplyr':
-## 
-##     id
-## 
-## Loading required package: RColorBrewer
-## WARNING: Rtools 3.1 found on the path at c:/Rtools is not compatible with R 3.2.0.
-## 
-## Please download and install Rtools 3.3 from http://cran.r-project.org/bin/windows/Rtools/, remove the incompatible version from your PATH, then run find_rtools().
-## 
-## Attaching package: 'qdap'
-## 
-## The following object is masked from 'package:dplyr':
-## 
-##     %>%
-## 
-## The following object is masked from 'package:base':
-## 
-##     Filter
-```
-
-```r
 activity <- read.csv("~/Coursera Files/ReproducibleResearch/activity.csv")
 activity <- transform(activity, date = factor(date))
 summary(activity)
@@ -90,7 +47,7 @@ stepMedian <- median(totalStepsPerDay, na.rm=TRUE)
 hist(totalStepsPerDay,main="Total Steps Per Day", xlab="Total Steps", ylab = "Frequency")
 ```
 
-![](figure/unnamed-chunk-2-1.png) 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
 
 
 The mean value is **10766.19** and the median value is **10765**. 
@@ -109,7 +66,7 @@ maximumInterval <- meanStepsPerInterval[which.max(meanStepsPerInterval$steps),1]
       xlab="Daily Interval", ylab="Number of Steps (mean)")
 ```
 
-![](figure/unnamed-chunk-3-1.png) 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
 
 The maximum mean steps value is **206.1698** and the interval for that is **835**. 
 Imputing missing values. For this situation, we are going to lookup the mean() value for the interval (across all days) and replace the NA with it's mean.  Here, we are replacing NAs with the mean Steps Per Interval value (as stored in the meanStepsPerInterval table).
@@ -146,7 +103,7 @@ abline(v=stepMean2, col = "red")
 abline(v=stepMedian2, col = "blue")
 ```
 
-![](figure/unnamed-chunk-4-1.png) 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
 
 There were 2304 records with "NA".  The mean value (red line on graph) is **9356.261** and the median value (blue line on graph) is **10395**. You can see from the chart that the replacing the NA interval values with thier mean skewed the earlier intervals to higher values.  
 
@@ -169,5 +126,5 @@ plot <- ggplot(plot_data, aes(x=interval,y=steps,group=weekend)) + geom_line(aes
 print(plot)
 ```
 
-![](figure/unnamed-chunk-5-1.png) 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
 
