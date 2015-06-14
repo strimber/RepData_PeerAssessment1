@@ -62,6 +62,9 @@ img {
 
 
 <p>title: “Reproducible Research: Peer Assessment 1” output: html_document: keep_md: true —</p>
+<pre class="r"><code>require(knitr)</code></pre>
+<pre><code>## Loading required package: knitr</code></pre>
+<pre class="r"><code>opts_chunk$set(echo = TRUE, cache = TRUE, cache.path = &quot;cache/&quot;, fig.path = &quot;figure/&quot;)</code></pre>
 <div id="loading-and-preprocessing-the-data" class="section level2">
 <h2>Loading and preprocessing the data</h2>
 <p>Here, we are loading the original source data and displaying a summary view of the raw data.</p>
@@ -76,45 +79,8 @@ img {
 ## The following objects are masked from 'package:base':
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(lubridate)
-library(ggplot2)
-library(qdap)</code></pre>
-<pre><code>## Loading required package: qdapDictionaries
-## Loading required package: qdapRegex
-## 
-## Attaching package: 'qdapRegex'
-## 
-## The following object is masked from 'package:ggplot2':
-## 
-##     %+%
-## 
-## The following objects are masked from 'package:dplyr':
-## 
-##     escape, explain
-## 
-## Loading required package: qdapTools
-## 
-## Attaching package: 'qdapTools'
-## 
-## The following object is masked from 'package:dplyr':
-## 
-##     id
-## 
-## Loading required package: RColorBrewer
-## WARNING: Rtools 3.1 found on the path at c:/Rtools is not compatible with R 3.2.0.
-## 
-## Please download and install Rtools 3.3 from http://cran.r-project.org/bin/windows/Rtools/, remove the incompatible version from your PATH, then run find_rtools().
-## 
-## Attaching package: 'qdap'
-## 
-## The following object is masked from 'package:dplyr':
-## 
-##     %&gt;%
-## 
-## The following object is masked from 'package:base':
-## 
-##     Filter</code></pre>
-<pre class="r"><code>activity &lt;- read.csv(&quot;~/Coursera Files/ReproducibleResearch/activity.csv&quot;)
+<pre class="r"><code>library(ggplot2)
+activity &lt;- read.csv(&quot;~/Coursera Files/ReproducibleResearch/activity.csv&quot;)
 activity &lt;- transform(activity, date = factor(date))
 summary(activity)</code></pre>
 <pre><code>##      steps                date          interval     

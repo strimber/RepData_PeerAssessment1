@@ -6,14 +6,17 @@ output:
     keep_md: true
 ---
 
+```{r setoptions, echo=TRUE}
+require(knitr)
+opts_chunk$set(echo = TRUE, cache = TRUE, cache.path = "cache/", fig.path = "figure/")
+```
+
 
 ## Loading and preprocessing the data
 Here, we are loading the original source data and displaying a summary view of the raw data.
 ```{r echo=TRUE}
 library(dplyr)
-library(lubridate)
 library(ggplot2)
-library(qdap)
 activity <- read.csv("~/Coursera Files/ReproducibleResearch/activity.csv")
 activity <- transform(activity, date = factor(date))
 summary(activity)
